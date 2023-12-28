@@ -1,5 +1,7 @@
-# LatencyLens
- LatencyLens offers real-time insights into your game's performance, displaying FPS, network latency, and memory usage of addons. This tool is designed to help you maintain optimal gameplay by providing crucial performance metrics at a glance.
+
+# ![DALL_E_2023-12-28_09 52 17_-_Create_a_simpler_64x64_icon_for_a_World_of_Warcraft_addon_called_LatencyLens _The_design_should_focus_on_minimalism__using_basic_shapes_and_symbols _I-removebg-preview](https://github.com/Kkthnx-Wow/LatencyLens/assets/40672673/0d4ec54a-a7c9-4813-8267-fd354de32af1)
+   
+LatencyLens offers real-time insights into your game's performance, displaying FPS, network latency, and memory usage of addons. This tool is designed to help you maintain optimal gameplay by providing crucial performance metrics at a glance.
 
 ## Join the Community
 Connect with thousands of users who have embraced Kkthnx's AddOns. Whether you're a casual user or want to dive deeper into discussions, join our vibrant community on [Discord](https://discord.gg/Rc9wcK9cAB).
