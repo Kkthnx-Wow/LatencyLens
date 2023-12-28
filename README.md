@@ -2,10 +2,10 @@
  LatencyLens offers real-time insights into your game's performance, displaying FPS, network latency, and memory usage of addons. This tool is designed to help you maintain optimal gameplay by providing crucial performance metrics at a glance.
 
 ## Join the Community
-Connect with thousands of users who have embraced KkthnxUI. Whether you're a casual user or want to dive deeper into discussions, join our vibrant community on [Discord](https://discord.gg/Rc9wcK9cAB).
+Connect with thousands of users who have embraced Kkthnx's AddOns. Whether you're a casual user or want to dive deeper into discussions, join our vibrant community on [Discord](https://discord.gg/Rc9wcK9cAB).
 
-*Why did the Orc go to KkthnxUI’s Discord?  
-To find a ‘Warchief’-ly good UI experience!*
+*Why did the Orc go to Kkthnx's Discord?  
+To find a ‘Warchief’-ly good addon experience!*
 
 ## Gift of Appreciation
 Show your support for the hard work and dedication put into KkthnxUI by gifting gametime or Blizzard balance to Kkthnx's gamertag: **Kkthnx#1105** or send it to **JRussell20@gmail.com** or donate through PayPal @ https://www.paypal.com/paypalme/kkthnxtv.
