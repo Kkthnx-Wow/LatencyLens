@@ -1,0 +1,6 @@
+{
+    "Lua.diagnostics.globals": [
+        "StaticPopup_Hide",
+        "StaticPopup_Show"
+    ]
+}
