@@ -86,6 +86,14 @@ frame:RegisterForDrag("LeftButton")
 frame:SetScript("OnDragStart", frame.StartMoving)
 frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
+-- Initialize default values for frame fields
+-- This is necessary to prevent nil value errors when these fields are accessed
+-- before they are set by their respective update functions. It ensures that the frame
+-- always has valid data to work with, enhancing the addon's stability and reliability.
+frame.fps = 0 -- Default value for FPS
+frame.lagHome = 0 -- Default value for home latency
+frame.lagWorld = 0 -- Default value for world latency
+
 -- Create a font string for the frame
 frame.text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 frame.text:SetPoint("CENTER")
@@ -107,14 +115,11 @@ local lastUpdate = 0
 local updateInterval = 10
 
 local function UpdateAddonMemoryUsage()
-	if InCombatLockdown() then
-		return -- Do nothing if in combat
-	end
-	local currentTime = GetTime()
-	if currentTime - lastUpdate > updateInterval then
-		UpdateAddOnMemoryUsage()
-		lastUpdate = currentTime
-	end
+    if InCombatLockdown() or (GetTime() - lastUpdate < updateInterval) then
+        return -- Do nothing if in combat or if the interval hasn't passed
+    end
+    UpdateAddOnMemoryUsage()
+    lastUpdate = GetTime()
 end
 
 -- Cache Addon Names
@@ -125,48 +130,45 @@ end
 
 -- Get Top Addons by Memory Usage
 local function GetTopAddons()
-	UpdateAddonMemoryUsage()
-	local addonUsage = {}
-	for i, name in ipairs(cachedAddonNames) do
-		if IsAddOnLoaded(i) then
-			local usage = GetAddOnMemoryUsage(i)
-			table_insert(addonUsage, { name = name, usage = usage })
-		end
-	end
-	table_sort(addonUsage, function(a, b)
-		return a.usage > b.usage
-	end)
-	return addonUsage
+    UpdateAddonMemoryUsage()
+    local addonUsage = {}
+
+    for i, name in ipairs(cachedAddonNames) do
+        if IsAddOnLoaded(i) then
+            table_insert(addonUsage, { name = name, usage = GetAddOnMemoryUsage(i) })
+        end
+    end
+
+    table_sort(addonUsage, function(a, b) return a.usage > b.usage end)
+    return addonUsage
 end
 
 -- Tooltip Update Function
 local TooltipOnEnter = false
 local function UpdateTooltip(self)
-	GameTooltip:SetOwner(self, "ANCHOR_TOP")
-	if IsLeftShiftKeyDown() then
-		-- Update the tooltip content with addon usage
-		local topAddons = GetTopAddons()
-		GameTooltip:ClearLines()
-		GameTooltip:AddLine(L["FPS"] .. self.fps)
-		GameTooltip:AddLine(L["HOME_LATENCY"] .. self.lagHome .. "ms")
-		GameTooltip:AddLine(L["WORLD_LATENCY"] .. self.lagWorld .. "ms")
-		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(L["TOP_ADDONS_BY_MEMORY"])
-		for i = 1, min(MAX_ADDONS_DISPLAYED, #topAddons) do
-			local usageKB = topAddons[i].usage
-			local usageStr = usageKB >= 1024 and string.format("%.2f MB", usageKB / 1024) or string.format("%.2f KB", usageKB)
-			GameTooltip:AddLine(string.format("|cff00ddff%d.|r %s - |cffffd700%s|r", i, topAddons[i].name, usageStr))
-		end
-	else
-		-- Update the tooltip content without addon usage
-		GameTooltip:ClearLines()
-		GameTooltip:AddLine(L["FPS"] .. self.fps)
-		GameTooltip:AddLine(L["HOME_LATENCY"] .. self.lagHome .. "ms")
-		GameTooltip:AddLine(L["WORLD_LATENCY"] .. self.lagWorld .. "ms")
-		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine(L["PRESS_SHIFT"])
-	end
-	GameTooltip:Show()
+    GameTooltip:SetOwner(self, "ANCHOR_TOP")
+    GameTooltip:ClearLines()
+
+    -- Add FPS and Latency lines
+    GameTooltip:AddLine(L["FPS"] .. self.fps)
+    GameTooltip:AddLine(L["HOME_LATENCY"] .. self.lagHome .. "ms")
+    GameTooltip:AddLine(L["WORLD_LATENCY"] .. self.lagWorld .. "ms")
+
+    if IsLeftShiftKeyDown() then
+        -- Additional details for memory usage
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine(L["TOP_ADDONS_BY_MEMORY"])
+        for i, addon in ipairs(GetTopAddons()) do
+            if i > MAX_ADDONS_DISPLAYED then break end
+            local usageStr = formatMemory(addon.usage)
+            GameTooltip:AddLine(string.format("|cff00ddff%d.|r %s - |cffffd700%s|r", i, addon.name, usageStr))
+        end
+    else
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine(L["PRESS_SHIFT"])
+    end
+
+    GameTooltip:Show()
 end
 
 -- Event Handlers
@@ -214,6 +216,3 @@ frame:SetScript("OnMouseUp", function(self, btn)
 		UpdateTooltip(self)
 	end
 end)
-
--- Show the frame
-frame:Show()
