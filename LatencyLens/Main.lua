@@ -49,19 +49,18 @@ local function formatMemory(value)
 end
 
 local function GetPerformanceColor(value, isLatency)
-    -- Define thresholds for latency and FPS
-    local thresholds = isLatency and {60, 120, 180, 250} or {10, 15, 30, 60}
-    local colors = {"|cff00ff00", "|cffffff00", "|cffff8000", "|cffff0000"}
+	-- Define thresholds for latency and FPS
+	local thresholds = isLatency and { 60, 120, 180, 250 } or { 10, 15, 30, 60 }
+	local colors = { "|cff00ff00", "|cffffff00", "|cffff8000", "|cffff0000" }
 
-    -- Iterate through the thresholds and return the corresponding color
-    for i, threshold in ipairs(thresholds) do
-        if (isLatency and value <= threshold) or (not isLatency and value >= threshold) then
-            return colors[i]
-        end
-    end
-    return colors[#colors] -- Default color if no thresholds are met
+	-- Iterate through the thresholds and return the corresponding color
+	for i, threshold in ipairs(thresholds) do
+		if (isLatency and value <= threshold) or (not isLatency and value >= threshold) then
+			return colors[i]
+		end
+	end
+	return colors[#colors] -- Default color if no thresholds are met
 end
-
 
 -- Create the main frame
 local frame = CreateFrame("Frame", "LatencyFPSFrame", UIParent)
@@ -90,7 +89,7 @@ local function UpdateLatencyFPS()
 	local _, _, lagHome, lagWorld = GetNetStats()
 	local fps = floor(GetFramerate())
 	local fpsColor = GetPerformanceColor(fps, false) -- For FPS
-local latencyColor = GetPerformanceColor(lagHome, true) -- For Latency
+	local latencyColor = GetPerformanceColor(lagHome, true) -- For Latency
 	frame.text:SetText(fpsColor .. fps .. "|rfps - " .. latencyColor .. lagHome .. "|rms")
 	frame.lagHome = lagHome
 	frame.lagWorld = lagWorld
@@ -102,11 +101,11 @@ local lastUpdate = 0
 local updateInterval = 10
 
 local function UpdateAddonMemoryUsage()
-    if InCombatLockdown() or (GetTime() - lastUpdate < updateInterval) then
-        return -- Do nothing if in combat or if the interval hasn't passed
-    end
-    UpdateAddOnMemoryUsage()
-    lastUpdate = GetTime()
+	if InCombatLockdown() or (GetTime() - lastUpdate < updateInterval) then
+		return -- Do nothing if in combat or if the interval hasn't passed
+	end
+	UpdateAddOnMemoryUsage()
+	lastUpdate = GetTime()
 end
 
 -- Cache Addon Names
@@ -117,45 +116,49 @@ end
 
 -- Get Top Addons by Memory Usage
 local function GetTopAddons()
-    UpdateAddonMemoryUsage()
-    local addonUsage = {}
+	UpdateAddonMemoryUsage()
+	local addonUsage = {}
 
-    for i, name in ipairs(cachedAddonNames) do
-        if IsAddOnLoaded(i) then
-            table_insert(addonUsage, { name = name, usage = GetAddOnMemoryUsage(i) })
-        end
-    end
+	for i, name in ipairs(cachedAddonNames) do
+		if IsAddOnLoaded(i) then
+			table_insert(addonUsage, { name = name, usage = GetAddOnMemoryUsage(i) })
+		end
+	end
 
-    table_sort(addonUsage, function(a, b) return a.usage > b.usage end)
-    return addonUsage
+	table_sort(addonUsage, function(a, b)
+		return a.usage > b.usage
+	end)
+	return addonUsage
 end
 
 -- Tooltip Update Function
 local TooltipOnEnter = false
 local function UpdateTooltip(self)
-    GameTooltip:SetOwner(self, "ANCHOR_TOP")
-    GameTooltip:ClearLines()
+	GameTooltip:SetOwner(self, "ANCHOR_TOP")
+	GameTooltip:ClearLines()
 
-    -- Add FPS and Latency lines
-    GameTooltip:AddLine(L["FPS"] .. self.fps)
-    GameTooltip:AddLine(L["HOME_LATENCY"] .. self.lagHome .. "ms")
-    GameTooltip:AddLine(L["WORLD_LATENCY"] .. self.lagWorld .. "ms")
+	-- Add FPS and Latency lines
+	GameTooltip:AddLine(L["FPS"] .. self.fps)
+	GameTooltip:AddLine(L["HOME_LATENCY"] .. self.lagHome .. "ms")
+	GameTooltip:AddLine(L["WORLD_LATENCY"] .. self.lagWorld .. "ms")
 
-    if IsLeftShiftKeyDown() then
-        -- Additional details for memory usage
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(L["TOP_ADDONS_BY_MEMORY"])
-        for i, addon in ipairs(GetTopAddons()) do
-            if i > MAX_ADDONS_DISPLAYED then break end
-            local usageStr = formatMemory(addon.usage)
-            GameTooltip:AddLine(string.format("|cff00ddff%d.|r %s - |cffffd700%s|r", i, addon.name, usageStr))
-        end
-    else
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(L["PRESS_SHIFT"])
-    end
+	if IsLeftShiftKeyDown() then
+		-- Additional details for memory usage
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(L["TOP_ADDONS_BY_MEMORY"])
+		for i, addon in ipairs(GetTopAddons()) do
+			if i > MAX_ADDONS_DISPLAYED then
+				break
+			end
+			local usageStr = formatMemory(addon.usage)
+			GameTooltip:AddLine(string.format("|cff00ddff%d.|r %s - |cffffd700%s|r", i, addon.name, usageStr))
+		end
+	else
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine(L["PRESS_SHIFT"])
+	end
 
-    GameTooltip:Show()
+	GameTooltip:Show()
 end
 
 -- Event Handlers

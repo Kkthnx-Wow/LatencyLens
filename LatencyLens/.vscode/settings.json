@@ -2,5 +2,9 @@
     "Lua.diagnostics.globals": [
         "StaticPopup_Hide",
         "StaticPopup_Show"
-    ]
+    ],
+    "stylua.styluaPath": "",
+    "[lua]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua"
+    },
 }
