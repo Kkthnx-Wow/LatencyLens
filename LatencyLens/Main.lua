@@ -48,33 +48,20 @@ local function formatMemory(value)
 	return value > 1024 and format("%.1f MB", value / 1024) or format("%.0f KB", value)
 end
 
-local function GetColor(value, isLatency)
-	local excellent, good, average, poor = isLatency and 60 or 60, isLatency and 120 or 30, isLatency and 180 or 15, isLatency and 250 or 10
+local function GetPerformanceColor(value, isLatency)
+    -- Define thresholds for latency and FPS
+    local thresholds = isLatency and {60, 120, 180, 250} or {10, 15, 30, 60}
+    local colors = {"|cff00ff00", "|cffffff00", "|cffff8000", "|cffff0000"}
 
-	if isLatency then
-		-- For latency, lower values are better
-		if value <= excellent then
-			return "|cff00ff00" -- Green
-		elseif value <= good then
-			return "|cffffff00" -- Yellow
-		elseif value <= average then
-			return "|cffff8000" -- Orange
-		else
-			return "|cffff0000" -- Red
-		end
-	else
-		-- For FPS and other metrics where higher values are better
-		if value >= excellent then
-			return "|cff00ff00" -- Green
-		elseif value >= good then
-			return "|cffffff00" -- Yellow
-		elseif value >= average then
-			return "|cffff8000" -- Orange
-		else
-			return "|cffff0000" -- Red
-		end
-	end
+    -- Iterate through the thresholds and return the corresponding color
+    for i, threshold in ipairs(thresholds) do
+        if (isLatency and value <= threshold) or (not isLatency and value >= threshold) then
+            return colors[i]
+        end
+    end
+    return colors[#colors] -- Default color if no thresholds are met
 end
+
 
 -- Create the main frame
 local frame = CreateFrame("Frame", "LatencyFPSFrame", UIParent)
@@ -102,8 +89,8 @@ frame.text:SetPoint("CENTER")
 local function UpdateLatencyFPS()
 	local _, _, lagHome, lagWorld = GetNetStats()
 	local fps = floor(GetFramerate())
-	local fpsColor = GetColor(fps, false) -- false indicates it's not latency
-	local latencyColor = GetColor(lagHome, true) -- true indicates it's latency
+	local fpsColor = GetPerformanceColor(fps, false) -- For FPS
+local latencyColor = GetPerformanceColor(lagHome, true) -- For Latency
 	frame.text:SetText(fpsColor .. fps .. "|rfps - " .. latencyColor .. lagHome .. "|rms")
 	frame.lagHome = lagHome
 	frame.lagWorld = lagWorld
