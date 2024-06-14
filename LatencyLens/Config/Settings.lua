@@ -7,7 +7,7 @@ LatencyLens:RegisterSettings("LatencyLensDB", {
 		type = "toggle",
 		title = "Toggle LatencyLens",
 		tooltip = "Toggle to display the stats.",
-		default = false,
+		default = true,
 	},
 	{
 		key = "noLabel",
