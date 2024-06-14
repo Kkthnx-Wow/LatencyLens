@@ -1,8 +1,20 @@
-## Interface: 100200
-## Title: |cFF00CCFFLatencyLens|r
-## Notes: LatencyLens offers real-time insights into your game's performance, displaying FPS, network latency, and memory usage of addons.|nThis tool is designed to help you maintain optimal gameplay by providing crucial performance metrics at a glance.|n|n|cff669DFFDeveloper|cffffffff:|r |nJosh "|CFF7b8489Kkthnx|r" Russell|n|n|cff009cdePayPal|r|cffffffff:|r |n|cffffffffwww.paypal.me/KkthnxTV|r|n|n|cfff96854Patreon|r|cffffffff:|r |n|cffffffffwww.patreon.com/Kkthnx|r
-## Author: Joshua Russell (Kkthnx)
-## IconTexture: Interface\AddOns\LatencyLens\LatencyLensIcon.tga
+## Interface: 100107
+## Name: LatencyLens
+## Title: |cff5bc0beLatencyLens|r
+## Notes: LatencyLens offers real-time insights into your game's performance,|ndisplaying FPS, network latency, and memory usage of addons.|n|n|cff669DFFDeveloper|cffffffff:|r |nJosh "|CFF7b8489Kkthnx|r" Russell|n|n|cff009cdePayPal|r|cffffffff:|r |n|cffffffffwww.paypal.me/KkthnxTV|r|n|n|cfff96854Patreon|r|cffffffff:|r |n|cffffffffwww.patreon.com/Kkthnx|r
+## Author: Josh "Kkthnx" Russell
+## Version: 1.0.0
+## IconTexture: 4631357
+## SavedVariables: LatencyLensDB
+## X-Support: DF
 
-Localization.lua
-Main.lua
+Libs\Dashi\embed.xml
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+Core\Database.lua
+Core\Functions.lua
+
+LatencyLens.lua
+
+Config\Settings.lua
