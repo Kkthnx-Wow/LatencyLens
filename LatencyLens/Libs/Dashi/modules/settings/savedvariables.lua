@@ -9,6 +9,8 @@ Loads a set of `savedvariables`, with `defaults` being set if they don't exist.
 Will trigger `namespace:TriggerOptionCallback(key, value)` for each pair.
 --]]
 function addon:LoadOptions(savedvariable, defaults)
+	addon:ArgCheck(savedvariable, 1, 'string')
+	addon:ArgCheck(defaults, 2, 'table')
 	assert(not self.optionsName, "can't load options more than once")
 
 	self.optionsDefaults = defaults
@@ -32,19 +34,52 @@ function addon:LoadOptions(savedvariable, defaults)
 	end
 end
 
+--[[ namespace:LoadExtraOptions(_defaults_)
+Loads a set of extra savedvariables, with `defaults` being set if they don't exist.  
+Requires options to be loaded.
+
+Will trigger `namespace:TriggerOptionCallback(key, value)` for each pair.
+--]]
+function addon:LoadExtraOptions(defaults)
+	assert(self.optionsName, "options not loaded")
+	addon:ArgCheck(defaults, 1, 'table')
+
+	-- migrate or load defaults
+	for key, value in next, defaults do
+		if _G[self.optionsName][key] == nil then
+			_G[self.optionsName][key] = value
+		end
+	end
+
+	-- trigger callbacks
+	for key, value in next, _G[self.optionsName] do
+		if defaults[key] ~= nil then
+			self:TriggerOptionCallbacks(key, value)
+		end
+	end
+end
+
 --[[ namespace:GetOption(_key_)
 Returns the value for the given option `key`.
 --]]
 function addon:GetOption(key)
 	assert(self:AreOptionsLoaded(), "options aren't loaded")
-	return _G[self.optionsName][key] or self.optionsDefaults[key]
+	addon:ArgCheck(key, 1, 'string')
+
+	if _G[self.optionsName][key] ~= nil then
+		return _G[self.optionsName][key]
+	else
+		return self.optionsDefaults[key]
+	end
 end
 
 --[[ namespace:GetOptionDefault(_key_)
 Returns the default value for the given option `key`.
 --]]
 function addon:GetOptionDefault(key)
-	return self.optionsDefaults and self.optionsDefaults[key]
+	addon:ArgCheck(key, 1, 'string')
+
+	return self.optionsDefaults ~= nil and self.optionsDefaults[key]
 end
 
 --[[ namespace:SetOption(_key_, _value_)
@@ -52,8 +87,40 @@ Sets a new `value` to the given options `key`.
 --]]
 function addon:SetOption(key, value)
 	assert(self:AreOptionsLoaded(), "options aren't loaded")
+	addon:ArgCheck(key, 1, 'string')
+
 	_G[self.optionsName][key] = value
 	self:TriggerOptionCallbacks(key, value)
+end
+
+function addon:SetOptionDefault(key, value)
+	assert(self:AreOptionsLoaded(), "options aren't loaded")
+	addon:ArgCheck(key, 1, 'string')
+
+	self.optionsDefaults[key] = value
+
+	if _G[self.optionsName][key] == nil then
+		self:SetOption(key, value)
+	end
+end
+
+do
+	local function startswith(str, start)
+		return str:sub(1, #start) == start
+	end
+
+	function addon:GetOptions(prefix)
+		assert(self:AreOptionsLoaded(), "options aren't loaded")
+
+		local options = {}
+		for key, value in next, _G[self.optionsName] do
+			if not prefix or startswith(key, prefix) then
+				options[key] = value
+			end
+		end
+
+		return options
+	end
 end
 
 --[[ namespace:AreOptionsLoaded()
@@ -68,6 +135,9 @@ end
 Register a `callback` function with the option `key`.
 --]]
 function addon:RegisterOptionCallback(key, callback)
+	addon:ArgCheck(key, 1, 'string')
+	addon:ArgCheck(callback, 2, 'function')
+
 	if not self.callbacks then
 		self.callbacks = {}
 	end
@@ -83,6 +153,8 @@ end
 Trigger all registered option callbacks for the given `key`, supplying the `value`.
 --]]
 function addon:TriggerOptionCallbacks(key, value)
+	addon:ArgCheck(key, 1, 'string')
+
 	if self.callbacks and self.callbacks[key] then
 		for _, callback in next, self.callbacks[key] do
 			callback(value)

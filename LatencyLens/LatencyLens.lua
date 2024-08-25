@@ -12,9 +12,9 @@ local GetCVarBool, SetCVar = GetCVarBool, SetCVar
 local GetFileStreamingStatus, GetBackgroundLoadingStatus = GetFileStreamingStatus, GetBackgroundLoadingStatus
 local GetFramerate, GetTime = GetFramerate, GetTime
 local GetNetStats, GetNetIpTypes = GetNetStats, GetNetIpTypes
-local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
-local GetNumAddOns = C_AddOns and C_AddOns.GetNumAddOns or GetNumAddOns
-local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo or GetAddOnInfo
+local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded
+local GetNumAddOns = C_AddOns and C_AddOns.GetNumAddOns
+local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo
 local IsShiftKeyDown = IsShiftKeyDown
 local ResetCPUUsage, collectgarbage, gcinfo = ResetCPUUsage, collectgarbage, gcinfo
 local UpdateAddOnCPUUsage, GetAddOnCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage
@@ -51,7 +51,7 @@ latencyLens:RegisterOptionCallback("enableStats", function(value)
 	enableStats = value
 
 	if enableStats then
-		latencyLens:OnLogin() -- Ensure statsFrame is initialized if enabled
+		latencyLens:PLAYER_LOGIN() -- Ensure statsFrame is initialized if enabled
 	else
 		-- Disable stats display
 		if statsFrame then
@@ -338,7 +338,7 @@ StaticPopupDialogs["CPUUSAGE_TOGGLE"] = {
 	whileDead = 1,
 }
 
-function latencyLens:OnLogin()
+function latencyLens:PLAYER_LOGIN()
 	self.loginTime = GetTime()
 
 	-- Initialize the addon and setup statsFrame if enabled
