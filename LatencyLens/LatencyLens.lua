@@ -7,16 +7,21 @@ local format, floor, min, max = format, floor, min, max
 local ipairs, tinsert, wipe, sort = ipairs, tinsert, wipe, sort
 
 -- WoW API functions
+local GameTooltip = GameTooltip
+local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo
 local GetAvailableBandwidth, GetDownloadedPercentage = GetAvailableBandwidth, GetDownloadedPercentage
 local GetCVarBool, SetCVar = GetCVarBool, SetCVar
 local GetFileStreamingStatus, GetBackgroundLoadingStatus = GetFileStreamingStatus, GetBackgroundLoadingStatus
 local GetFramerate, GetTime = GetFramerate, GetTime
+local GetNetStats = GetNetStats
 local GetNetStats, GetNetIpTypes = GetNetStats, GetNetIpTypes
-local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded
 local GetNumAddOns = C_AddOns and C_AddOns.GetNumAddOns
-local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo
+local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded
 local IsShiftKeyDown = IsShiftKeyDown
+local IsShiftKeyDown = IsShiftKeyDown
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local ResetCPUUsage, collectgarbage, gcinfo = ResetCPUUsage, collectgarbage, gcinfo
+local UnitClass = UnitClass
 local UpdateAddOnCPUUsage, GetAddOnCPUUsage = UpdateAddOnCPUUsage, GetAddOnCPUUsage
 local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage
 
@@ -67,7 +72,14 @@ latencyLens:RegisterOptionCallback("enableStats", function(value)
 	end
 end)
 
+local addonListBuilt = false
+
 local function buildAddonList()
+	if addonListBuilt then
+		return
+	end
+	addonListBuilt = true
+
 	local numAddons = GetNumAddOns()
 	if numAddons == #infoTable then
 		return
@@ -151,11 +163,20 @@ local function setFrameRateAndLatency(self)
 	if noLabel then
 		self.text:SetText(colorFPS(fps) .. " / " .. colorLatency(latency))
 	else
-		self.text:SetText(L["Fps"] .. ": " .. colorFPS(fps) .. " |r " .. L["Ms"] .. ": " .. colorLatency(latency) .. "|r")
+		self.text:SetText(table.concat({ L["Fps"], ": ", colorFPS(fps), " |r ", L["Ms"], ": ", colorLatency(latency), "|r" }))
 	end
 end
 
+local lastUpdateTime = 0
+local updateInterval = 1 -- Update every 1 second
+
 local function onEnter(self)
+	local currentTime = GetTime()
+	if currentTime - lastUpdateTime < updateInterval then
+		return
+	end
+	lastUpdateTime = currentTime
+
 	enteredFrame = true
 
 	if not next(infoTable) then
